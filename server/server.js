@@ -36,7 +36,7 @@ connection.query('SELECT * FROM users', function(err, rows) {
         return 
     }
     console.log(rows)
-})
+}) 
 
 
 app.post('/validatePassword', (req, res) => {
@@ -44,18 +44,16 @@ app.post('/validatePassword', (req, res) => {
     const sql = 'SELECT * FROM users WHERE email = ?'
     connection.query(sql, [email], async function(err, rows) {
         if (err) {
-            return done({message: err + '!'})
+
         }
         if(!rows.length) { 
             res.send({validation: false})
-            return done(null) 
         }
 
         const hashedPasswordDB = rows[0].hashed_password
         bcrypt.compare(password, hashedPasswordDB, function(err, ok) {
             if (err || !ok) {
                 res.send({validation: false})
-                return done({message: err + '!'})
             } else {
                 res.send({validation: true})
             }

@@ -1,28 +1,37 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Form, Input, Button, Checkbox } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import axios from 'axios'
 
-export default function Login() {
-
-    const onFinish = values => {
-        const {email, password} = values
-        axios.post('http://localhost:3002/validatePassword', {email, password})
-        .then(res => {
-            if (res.data.validation) {
-                alert('Login succesful!')
+const useLogin = () => {
+    const navigate = useNavigate()
+    const onFinish = async (values) => {
+        const { email, password } = values
+        try {
+            const response = await axios.post('http://localhost:3002/validatePassword', { email, password })
+            if (response.data.validation) {
+                navigate('/dashboard')
             } else {
                 alert('Incorrect email or password')
             }
-        })
+        } catch (error) {
+            console.error('Error during login:', error)
+        }
     }
+    return { onFinish }
+}
+
+export default function Login() {
+
+    const { onFinish } = useLogin()
 
     return (
         <div style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
 
             <div style={{width:400}}>
 
-                <h1 style={{textAlign:'center'}}>Login</h1>
+                <h1 style={{textAlign:'center'}}>Login</h1> 
 
 
             <Form
