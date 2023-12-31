@@ -65,9 +65,11 @@ app.post('/validatePassword', (req, res) => {
 
 
 const indexRouter = require('./routes/index') // reference to index route
+const registerRouter = require('./routes/register') // reference to register route
 
 
 app.use('/', indexRouter)
+app.use('/register', registerRouter)
 
 
 app.listen(process.env.PORT || 3002, () => {

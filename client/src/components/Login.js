@@ -58,9 +58,8 @@ export default function Login() {
                     required: true,
                     message: 'Please input your Password!',
                 },
-                ]}
-            >
-                <Input
+                ]}>
+                <Input.Password
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Password"
@@ -80,7 +79,7 @@ export default function Login() {
                 <Button type="primary" htmlType="submit" className="login-form-button">
                 Log in
                 </Button>
-                Or <a href="">register now!</a>
+                Or <a href="/Register">register now!</a>
             </Form.Item>
             </Form>
 
