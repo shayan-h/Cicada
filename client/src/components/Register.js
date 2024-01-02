@@ -15,7 +15,7 @@ const useRegister = () => {
                 alert('Incorrect email or password')
             }
         } catch (error) {
-            console.error('Error during login:', error)
+            console.error('Error during sign-up:', error)
         }
     }
     return { onFinish }
