@@ -17,9 +17,9 @@ connection.connect(function(err) {
     console.log('Dashboard connected as id ' + connection.threadId)
 })
 
-router.get('/', (req, res) => {
+router.get('/', isAuthenticated, (req, res) => {
     try {
-        const email = "shayanwork612@gmail.com"
+        const email = req.user.email
         const query = "SELECT first_name, projects FROM users WHERE email = ?"
         connection.query(query, [email], async (err, results) => {
             if (err) {
@@ -46,9 +46,17 @@ router.get('/', (req, res) => {
             res.send(uzer.first_name)
         })
     } catch {
-        res.send("")
+        res.send("error")
         console.log("In catch.")
     }
 })
+
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    console.log("Not authenticated")
+    res.send("error");
+}
 
 module.exports = router
