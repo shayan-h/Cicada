@@ -10,7 +10,7 @@ const useRegister = () => {
         try {
             const response = await axios.post('http://localhost:3002/register/registerUser', { fName, lName, email, password })
             if (response.data.validation) {
-                navigate('/dashboard')
+                navigate('/login')
             } else {
                 alert('Incorrect email or password')
             }

@@ -11,7 +11,7 @@ const useLogin = () => {
         try {
             const response = await axios.post('http://localhost:3002/validatePassword', { email, password })
             if (response.data.validation) {
-                navigate('/dashboard')
+                navigate('/home')
             } else {
                 alert('Incorrect email or password')
             }

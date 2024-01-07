@@ -17,7 +17,7 @@ connection.connect(function(err) {
     console.log('Dashboard connected as id ' + connection.threadId)
 })
 
-router.get('/', isAuthenticated, (req, res) => {
+router.get('/dash', isAuthenticated, (req, res) => {
     try {
         const email = req.user.email
         const query = "SELECT first_name, projects FROM users WHERE email = ?"
