@@ -1,28 +1,20 @@
-const express = require('express')
+import express from 'express'
 const router = express.Router()
-const mysql = require('mysql2')
-const bcrypt = require('bcrypt')
-const config = require('../config');
+import mysql from 'mysql2'
+import bcrypt from 'bcrypt'
+import config from '../config.js'
 
 const connection = mysql.createConnection({
     host: config.database.host,
     user: config.database.user,
     password: config.database.password,
     database: config.database.database
-  })
-connection.connect(function(err) {
-    if (err) {
-        console.error('Error connecting: ' + err.stack)
-        return
-    }
-    console.log('Register connected as id ' + connection.threadId)
 })
-
 
 function emailExists(email) {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT email FROM users WHERE email = ?'
-        connection.query(sql, [email], function(err, rows) {
+        connection.query(sql, [email], (err, rows) => {
             if (err) {
                 console.log(err)
                 reject(err)
@@ -34,36 +26,36 @@ function emailExists(email) {
                 console.log(rows)
                 resolve(true)
             }
-        })
-    })
+        });
+    });
 }
 
-
-router.post('/registerUser', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const emailRes = await emailExists(req.body.email)
         if (emailRes) {
-            console.log('Email already exists') 
-            res.send({validation: false})
+            console.log('Email already exists')
+            res.send({ validation: false })
         } else {
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
             await connection.promise().query(
-            'INSERT INTO users (email, first_name, last_name, hashed_password) VALUES (?, ?, ?, ?)', 
-            [req.body.email, req.body.fName, req.body.lName, hashedPassword], (err, results) => {
-                if (err) {
-                    console.log('This is the error: ' + error)
-                } else {
-                    console.log('Success query')
+                'INSERT INTO users (email, first_name, last_name, hashed_password) VALUES (?, ?, ?, ?)',
+                [req.body.email, req.body.fName, req.body.lName, hashedPassword],
+                (err, results) => {
+                    if (err) {
+                        console.log('This is the error: ' + error)
+                    } else {
+                        console.log('Success query')
+                    }
                 }
-            })
-            const { fName, lName, email, password } = req.body
-            res.send({validation: true})
-            console.log('Registeration successful')
+            )
+            res.send({ validation: true })
+            console.log('Registration successful')
         }
-    } catch {
-        res.send({validation: false})
+    } catch (error) {
+        res.send({ validation: false })
         console.log('In catch.')
     }
-})
+});
 
-module.exports = router // exports router
+export default router

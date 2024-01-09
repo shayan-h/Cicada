@@ -1,62 +1,34 @@
-const express = require('express')
-const router = express.Router()
-const mysql = require('mysql2')
-const config = require('../config');
+import express from 'express';
+import mysql from 'mysql2';
+import config from '../config.js';
+import jwt from 'jsonwebtoken'
+const router = express.Router();
 
 const connection = mysql.createConnection({
     host: config.database.host,
     user: config.database.user,
     password: config.database.password,
     database: config.database.database
-  })
-connection.connect(function(err) {
-    if (err) {
-        console.error('Error connecting: ' + err.stack)
-        return
-    }
-    console.log('Dashboard connected as id ' + connection.threadId)
 })
 
-router.get('/dash', isAuthenticated, (req, res) => {
-    try {
-        const email = req.user.email
-        const query = "SELECT first_name, projects FROM users WHERE email = ?"
-        connection.query(query, [email], async (err, results) => {
+const isAuthenticated = (req, res, next) => {
+    const token = req.cookies.token
+    if (!token) {
+        return res.json({authenticated: false})
+    } else {
+        jwt.verify(token, config.token.key, (err, decoded) => {
             if (err) {
-                // Handle any errors
-                console.error(err);
-                return;
+                return res.json({authenticated: false})
+            } else {
+                req.id = decoded.id
+                next()
             }
-            const uzer = results[0]
-            const userProjects = uzer.projects
-            const projectsArray = []
-
-            /*
-            for (const projectId in userProjects) {
-                const projectDetails = await getProjectDetails(userProjects[projectId]);
-                // console.log('Project Details:', projectDetails);
-                projectsArray.push({
-                id: userProjects[projectId],
-                projName: projectDetails.project_name,
-                teamMembers: projectDetails.team_members,
-                status: projectDetails.stat
-                })
-            }
-            */
-            res.send(uzer.first_name)
         })
-    } catch {
-        res.send("error")
-        console.log("In catch.")
     }
-})
-
-function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    console.log("Not authenticated")
-    res.send("error");
 }
 
-module.exports = router
+router.get('/', isAuthenticated, (req, res) => {
+    return res.json({authenticated: true, id: req.id})
+})
+
+export default router;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, Checkbox, Form, Input } from 'antd';
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -8,9 +8,9 @@ const useRegister = () => {
     const onFinish = async (values) => {
         const { fName, lName, email, password } = values
         try {
-            const response = await axios.post('http://localhost:3002/register/registerUser', { fName, lName, email, password })
+            const response = await axios.post('http://localhost:3002/register', { fName, lName, email, password })
             if (response.data.validation) {
-                navigate('/login')
+                navigate('/')
             } else {
                 alert('Incorrect email or password')
             }
@@ -149,6 +149,7 @@ export default function Register() {
                     <Button type="primary" htmlType="submit">
                     Submit
                     </Button>
+                    Or <a href="/">Login</a>
                 </Form.Item>
                 </Form>
             </div>

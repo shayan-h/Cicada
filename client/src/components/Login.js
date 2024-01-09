@@ -6,12 +6,14 @@ import axios from 'axios'
 
 const useLogin = () => {
     const navigate = useNavigate()
+    axios.defaults.withCredentials = true
     const onFinish = async (values) => {
         const { email, password } = values
         try {
-            const response = await axios.post('http://localhost:3002/validatePassword', { email, password })
+            const response = await axios.post('http://localhost:3002/login', { email, password })
             if (response.data.validation) {
-                navigate('/home')
+                navigate('/dashboard')
+                // alert('Login succesful')
             } else {
                 alert('Incorrect email or password')
             }
@@ -79,7 +81,7 @@ export default function Login() {
                 <Button type="primary" htmlType="submit" className="login-form-button">
                 Log in
                 </Button>
-                Or <a href="/Register">register now!</a>
+                Or <a href="/register">register now!</a>
             </Form.Item>
             </Form>
 

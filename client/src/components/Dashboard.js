@@ -1,17 +1,25 @@
 import React, {useState, useEffect} from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../styles/Dashboard.css'
 import axios from 'axios'
 
 
 export default function Dashboard() {
 
-  const [data, setData] = useState([])
+  const navigate = useNavigate()
+  axios.defaults.withCredentials = true
+  // The following line of code can be changed set to different types of data from the server
+  const [id, setData] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3002/dashboard/dash") 
-        setData(response.data)
+        const response = await axios.get("http://localhost:3002/dashboard")
+        if (response.data.authenticated) {
+          setData(response.data.id)
+        } else {
+          navigate('/')
+        }
       } catch (error) {
         console.log("Error during dashboard fetch", error)
       }
@@ -77,7 +85,7 @@ export default function Dashboard() {
           <div className="user-wrapper">
             <img src="cicadalogo.jpg" width="40px" height="40px" alt="" />
             <div>
-              <h4>Hello, {data}</h4>
+              <h4>Hello, User{id}</h4>
               <small>Student</small>
             </div>
           </div>

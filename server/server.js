@@ -1,19 +1,21 @@
-const express = require('express') // import express
+import express from 'express'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
+import mysql from 'mysql2'
+import config from './config.js'
+
+import registerRouter from './routes/register.js'
+import loginRouter from './routes/login.js'
+import dashboardRouter from './routes/dashboard.js'
+
 const app = express()
-const mysql = require('mysql2')
-const cors = require('cors')
-const config = require('./config');
-const cookie = require('cookie-parser') // cookie
-const session = require('express-session');
-const BetterMemoryStore = require('session-memory-store')(session)
-const bodyParser = require('body-parser')
-const passport = require('passport')
-const initializePassport = require('./passportConfig');
-
-
-app.use(cors())
-app.use(cookie())
-
+app.use(express.json())
+app.use(cookieParser())
+app.use(cors({
+    origin: ["http://localhost:3000"],
+    methods: ["POST", "GET"],
+    credentials: true
+}))
 
 const connection = mysql.createConnection({
     host: config.database.host,
@@ -21,68 +23,20 @@ const connection = mysql.createConnection({
     password: config.database.password,
     database: config.database.database
 })
-
-// Connect to the database
-connection.connect(function(err) {
+connection.query("SELECT * FROM users", (err, rows) => {
     if (err) {
-        console.error('Error connecting: ' + err.stack)
-        return
-    }
-    console.log('Connected as id ' + connection.threadId)
-})
-
-// Test SQL query ------------------------------------------------------------------------------
-connection.query('SELECT * FROM users', function(err, rows) {
-    if (err) {
-        console.error(err)
-        return 
-    }
-    console.log(rows)
-}) 
-
-app.use(express.urlencoded({extended: false}))
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const store = new BetterMemoryStore({expire: 60*60*1000, debug: true})
-app.use(session({
-    cookie: {
-        httpOnly: true,
-        secure: false
-    },
-    name: 'session',
-    secret: 'VERYVERYSECRETYO',
-    store: store,
-    resave: false,
-    saveUninitialized: false,
-    credentials: 'include'
-}))
-initializePassport(connection);
-app.use(passport.initialize());
-app.use(passport.session());
-
-
-
-app.post('/validatePassword', passport.authenticate('local', {
-    failureFlash: true
-}), function(req, res) {
-    if (req.user) {
-        res.send({validation: true})
+        console.log("Error mysql")
+    } else {
+        console.log(rows)
     }
 })
 
 
 
-const indexRouter = require('./routes/index') // reference to index route
-const registerRouter = require('./routes/register') // reference to register route
-const dashboardRouter = require('./routes/dashboard') // reference to dashboard route
-
-
-app.use('/', indexRouter)
 app.use('/register', registerRouter)
+app.use('/login', loginRouter)
 app.use('/dashboard', dashboardRouter)
 
-
-app.listen(process.env.PORT || 3002, () => {
-    console.log("Server running on port 3002")
-}) // default to port 3002
+app.listen(3002, () => {
+    console.log("Server connected on port 3002")
+})
