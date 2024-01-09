@@ -9,14 +9,14 @@ export default function Dashboard() {
   const navigate = useNavigate()
   axios.defaults.withCredentials = true
   // The following line of code can be changed set to different types of data from the server
-  const [id, setData] = useState(0)
+  const [name, setData] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:3002/dashboard")
         if (response.data.authenticated) {
-          setData(response.data.id)
+          setData(response.data.name)
         } else {
           navigate('/')
         }
@@ -85,7 +85,7 @@ export default function Dashboard() {
           <div className="user-wrapper">
             <img src="cicadalogo.jpg" width="40px" height="40px" alt="" />
             <div>
-              <h4>Hello, User{id}</h4>
+              <h4>Hello, {name}</h4>
               <small>Student</small>
             </div>
           </div>

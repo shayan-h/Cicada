@@ -25,7 +25,7 @@ const connection = mysql.createConnection({
 })
 connection.query("SELECT * FROM users", (err, rows) => {
     if (err) {
-        console.log("Error mysql")
+        console.log("Error in server: mysql")
     } else {
         console.log(rows)
     }

@@ -28,7 +28,15 @@ const isAuthenticated = (req, res, next) => {
 }
 
 router.get('/', isAuthenticated, (req, res) => {
-    return res.json({authenticated: true, id: req.id})
+    const query = "SELECT first_name FROM users WHERE id = ?"
+    connection.query(query, [req.id], (err, rows) => {
+        if (err) {
+            console.log("Error in dashboard: mysql")
+            return ;
+        }
+        const user = rows[0]
+        return res.json({authenticated: true, name: user.first_name})
+    })
 })
 
 export default router;
