@@ -27,7 +27,12 @@ export default function Dashboard() {
     fetchData()
   }, [])
 
-
+  const handleDelete = () => {
+    axios.get('http://localhost:3002/login/logout')
+    .then(res => {
+      window.location.reload(true)
+    }).catch(err => console.log(err))
+  }
 
   return (
     <body>
@@ -66,6 +71,7 @@ export default function Dashboard() {
                 <span>Settings</span>
               </a>
             </li>
+            <button className="btn btn-danger" onClick={handleDelete}>Logout</button>
           </ul>
         </div>
       </div>

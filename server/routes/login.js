@@ -14,6 +14,21 @@ const connection = mysql.createConnection({
     database: config.database.database
 })
 
+const isAuthenticated = (req, res, next) => {
+    const token = req.cookies.token
+    if (!token) {
+        return res.json({authenticated: false})
+    } else {
+        jwt.verify(token, config.token.key, (err, decoded) => {
+            if (err) {
+                return res.json({authenticated: false})
+            } else {
+                next()
+            }
+        })
+    }
+}
+
 router.post('/', (req, res) => {
     const sql = 'SELECT * FROM users WHERE email = ?'
     connection.query(sql, [req.body.email], async (err, rows) => {
@@ -38,6 +53,15 @@ router.post('/', (req, res) => {
             res.json({validation: true})
         })
     })
+})
+
+router.get('/auth', isAuthenticated, (req, res) => {
+    return res.json({authenticated: true})
+})
+
+router.get('/logout', (req, res) => {
+    res.clearCookie('token')
+    return res.json({validation: true})
 })
 
 export default router

@@ -2,6 +2,7 @@ import express from 'express'
 const router = express.Router()
 import mysql from 'mysql2'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 import config from '../config.js'
 
 const connection = mysql.createConnection({
@@ -10,6 +11,21 @@ const connection = mysql.createConnection({
     password: config.database.password,
     database: config.database.database
 })
+
+const isAuthenticated = (req, res, next) => {
+    const token = req.cookies.token
+    if (!token) {
+        return res.json({authenticated: false})
+    } else {
+        jwt.verify(token, config.token.key, (err, decoded) => {
+            if (err) {
+                return res.json({authenticated: false})
+            } else {
+                next()
+            }
+        })
+    }
+}
 
 function emailExists(email) {
     return new Promise((resolve, reject) => {
@@ -30,7 +46,7 @@ function emailExists(email) {
     });
 }
 
-router.post('/', async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
     try {
         const emailRes = await emailExists(req.body.email)
         if (emailRes) {
@@ -56,6 +72,10 @@ router.post('/', async (req, res) => {
         res.send({ validation: false })
         console.log('In catch.')
     }
-});
+})
+
+router.get('/auth', isAuthenticated, (req, res) => {
+    return res.json({authenticated: true})
+})
 
 export default router

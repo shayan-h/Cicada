@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Input, Button, Checkbox } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import '../styles/Login.css'
 import axios from 'axios'
 
 const useLogin = () => {
@@ -27,13 +28,31 @@ const useLogin = () => {
 export default function Login() {
 
     const { onFinish } = useLogin()
+    const navigate = useNavigate()
+    axios.defaults.withCredentials = true
+    const [authenticated, setAuthenticated] = useState(false)
+
+    useEffect(() => {
+        const checkAuthentication = async () => {
+          try {
+            const response = await axios.get('http://localhost:3002/login/auth')
+            setAuthenticated(response.data.authenticated)
+            if (response.data.authenticated) {
+              navigate('/dashboard')
+            }
+          } catch (error) {
+            console.error('Error checking authentication:', error)
+          }
+        }
+        checkAuthentication()
+      }, [navigate])
 
     return (
-        <div style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
+        <div className="login-page" style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
 
             <div style={{width:400}}>
 
-                <h1 style={{textAlign:'center'}}>Login</h1> 
+            <h1 style={{ textAlign: 'center', fontSize: '2em', color: '#fff' }}>Login</h1> 
 
 
             <Form
@@ -73,11 +92,11 @@ export default function Login() {
                 </Form.Item>
 
                 <a className="login-form-forgot" href="">
-                Forgot password
+                Forgot password?
                 </a>
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item class="form-item-register">
                 <Button type="primary" htmlType="submit" className="login-form-button">
                 Log in
                 </Button>

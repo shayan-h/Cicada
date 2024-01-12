@@ -31,8 +31,6 @@ connection.query("SELECT * FROM users", (err, rows) => {
     }
 })
 
-
-
 app.use('/register', registerRouter)
 app.use('/login', loginRouter)
 app.use('/dashboard', dashboardRouter)
