@@ -10,6 +10,7 @@ export default function Dashboard() {
   axios.defaults.withCredentials = true
   // The following line of code can be changed set to different types of data from the server
   const [name, setData] = useState('')
+  const [projects, setProjData] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,6 +18,7 @@ export default function Dashboard() {
         const response = await axios.get("http://localhost:3002/dashboard")
         if (response.data.authenticated) {
           setData(response.data.name)
+          setProjData(response.data.projects)
         } else {
           navigate('/')
         }
@@ -32,6 +34,10 @@ export default function Dashboard() {
     .then(res => {
       window.location.reload(true)
     }).catch(err => console.log(err))
+  }
+
+  const handleNewProjectButtonClick = () => {
+    navigate('/NewProject')
   }
 
   return (
@@ -89,7 +95,7 @@ export default function Dashboard() {
             <input type="search" placeholder="Looking for something?" />
           </div>
           <div className="user-wrapper">
-            <img src="cicadalogo.jpg" width="40px" height="40px" alt="" />
+            <img src={process.env.PUBLIC_URL + '/bug_danger_data_internet_malware_security_virus_icon_127084.ico'} width="40px" height="40px" alt="" />
             <div>
               <h4>Hello, {name}</h4>
               <small>Student</small>
@@ -99,14 +105,49 @@ export default function Dashboard() {
 
         <main>
           <div className="cards">
-            {/* Your card components here */}
+          <div class="card-single">
+                    <div>
+                        <h1>612</h1>
+                        <span>Projects</span>
+                    </div>
+                    <div>
+                        <span class="las la-code-branch"></span>
+                    </div>
+                </div>
+                <div class="card-single">
+                    <div>
+                        <h1>612</h1>
+                        <span>Tags</span>
+                    </div>
+                    <div>
+                        <span class="las la-bug"></span>
+                    </div>
+                </div>
+                <div class="card-single">
+                    <div>
+                        <h1>612</h1>
+                        <span>Team</span>
+                    </div>
+                    <div>
+                        <span class="las la-clone"></span>
+                    </div>
+                </div>
+                <div class="card-single">
+                    <div>
+                        <h1>612</h1>
+                        <span>Cicada.AI</span>
+                    </div>
+                    <div>
+                        <span class="las la-robot"></span>
+                    </div>
+                </div>
           </div>
           <div className="recent-grid">
             <div className="projects">
               <div className="card">
                 <div className="card-header">
                   <h3>Projects</h3>
-                  <button id="newProjectButton">
+                  <button id="newProjectButton" onClick={handleNewProjectButtonClick}>
                     New Project <span className="las la-plus"></span>
                   </button>
                   {/* Your script for newProjectButton click event here */}
@@ -118,12 +159,19 @@ export default function Dashboard() {
                       <thead>
                         <tr>
                           <td>Project name</td>
-                          <td>Team members</td>
                           <td>Status</td>
                         </tr>
                       </thead>
                       <tbody>
-                        {/* Your projects mapping here */}
+                        {projects.map(project => (
+                          <tr key={project.id}>
+                            <td>{project.projName}</td>
+                            <td>
+                              <span className={`status ${project.status === 'Complete' ? 'green' : 'red'}`}></span>
+                              {project.status}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>

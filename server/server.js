@@ -7,6 +7,7 @@ import config from './config.js'
 import registerRouter from './routes/register.js'
 import loginRouter from './routes/login.js'
 import dashboardRouter from './routes/dashboard.js'
+import newProjectRouter from './routes/newProject.js'
 
 const app = express()
 app.use(express.json())
@@ -34,6 +35,7 @@ connection.query("SELECT * FROM users", (err, rows) => {
 app.use('/register', registerRouter)
 app.use('/login', loginRouter)
 app.use('/dashboard', dashboardRouter)
+app.use('/newProject', newProjectRouter)
 
 app.listen(3002, () => {
     console.log("Server connected on port 3002")

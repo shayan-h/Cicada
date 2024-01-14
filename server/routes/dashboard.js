@@ -28,15 +28,40 @@ const isAuthenticated = (req, res, next) => {
 }
 
 router.get('/', isAuthenticated, (req, res) => {
-    const query = "SELECT first_name FROM users WHERE id = ?"
-    connection.query(query, [req.id], (err, rows) => {
+    const query = "SELECT first_name, projects FROM users WHERE id = ?"
+    connection.query(query, [req.id], async (err, rows) => {
         if (err) {
             console.log("Error in dashboard: mysql")
             return ;
         }
         const user = rows[0]
-        return res.json({authenticated: true, name: user.first_name})
+        const userProjects = user.projects 
+        const projectsArray = []
+
+        for (const projectId in userProjects) {
+            const projectDetails = await getProjectDetails(userProjects[projectId])
+            projectsArray.push({
+                id: userProjects[projectId],
+                projName: projectDetails.project_name,
+                teamMembers: projectDetails.teamMembers,
+                status: projectDetails.stat
+            })
+        }
+        return res.json({authenticated: true, name: user.first_name, projects: projectsArray})
     })
 })
+
+function getProjectDetails(projectId) {
+  const query = "SELECT project_name, team_members, stat FROM projects WHERE id = ?";
+  return new Promise((resolve,reject) => {
+    connection.query(query, [projectId], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results[0]);
+      }
+    })
+  })
+}
 
 export default router;
