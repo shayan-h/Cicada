@@ -49,7 +49,7 @@ router.post('/', isAuthenticated, (req, res) => {
     const teamMembersJsonToString = JSON.stringify(teamMembersJson) 
     const statusString = "In Progress"
 
-    // SEND team members email to join project through API
+    // SEND team members email to join project through API && Check if team member email even exists in user database
 
     // Add new project into projects table
     const query = "INSERT INTO projects (project_name, team_members, stat, des) VALUES (?, ?, ?, ?)"
@@ -107,6 +107,10 @@ router.post('/', isAuthenticated, (req, res) => {
                         if (err) {
                             console.log(err)
                             return
+                        }
+                        if (!updateTeamMemberRes || updateTeamMemberRes.length === 0) {
+                            console.log("User DNE")
+                            return 
                         }
                         console.log(updateTeamMemberRes)
                         let teamMemberProjectsJson = updateTeamMemberRes[0].projects ? updateTeamMemberRes[0].projects : {}

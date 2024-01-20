@@ -60,7 +60,7 @@ export default function Dashboard() {
               </a>
             </li>
             <li>
-              <a href="projects">
+              <a href="/projects">
                 <span className="las la-code-branch"></span>
                 <span>Projects</span>
               </a>

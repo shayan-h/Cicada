@@ -1,0 +1,59 @@
+.create-project-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .create-project-container .form-box {
+    background-color: #8458B3;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .create-project-container h1 {
+    text-align: center;
+    color: #fff; /* Set text color to white */
+  }
+  
+  .create-project-container form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .create-project-container label {
+    margin-top: 10px;
+    color: #fff; /* Set text color to white */
+  }
+  
+  .create-project-container input,
+  .create-project-container textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+  
+  .create-project-container #teamMembersContainer {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .create-project-container button {
+    margin-top: 10px;
+    padding: 8px;
+    cursor: pointer;
+    background-color: #fff; /* Set button background color to white */
+    color: #8458B3; /* Set button text color to the specified color */
+    border: 1px solid #fff; /* Add border to the button */
+  }
+  
+  .create-project-container #teamMembersContainer input,
+  .create-project-container button {
+    width: 50%;
+    margin: 5px auto;
+  }
+  

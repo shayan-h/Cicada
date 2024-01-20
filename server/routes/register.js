@@ -46,7 +46,7 @@ function emailExists(email) {
     });
 }
 
-router.post('/', isAuthenticated, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const emailRes = await emailExists(req.body.email)
         if (emailRes) {

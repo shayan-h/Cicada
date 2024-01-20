@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Register from './components/Register';
 import NewProject from './components/NewProject';
+import Projects from './components/Projects';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login/>} />
           <Route path="/dashboard" element={<Dashboard/>}></Route>
+          <Route path="/projects" element={<Projects/>}></Route>
           <Route path="/register" element={<Register/>}></Route>
           <Route path="/newProject" element={<NewProject/>}></Route>
         </Routes>
