@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import Register from './components/Register';
 import NewProject from './components/NewProject';
 import Projects from './components/Projects';
+import NewTag from './components/NewTag';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/projects" element={<Projects/>}></Route>
           <Route path="/register" element={<Register/>}></Route>
           <Route path="/newProject" element={<NewProject/>}></Route>
+          <Route path="/newTag" element={<NewTag/>}></Route>
         </Routes>
       </BrowserRouter>
     </div>

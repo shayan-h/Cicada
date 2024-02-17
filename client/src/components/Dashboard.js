@@ -40,6 +40,10 @@ export default function Dashboard() {
     navigate('/NewProject')
   }
 
+  const handleNewTagButtonClick = () => {
+    navigate('/NewTag')
+  }
+
   return (
     <body>
       <input type="checkbox" id="nav-toggle" />
@@ -184,7 +188,7 @@ export default function Dashboard() {
                 <div className="card-header">
                   <h3>Your Tags</h3>
                   <button>
-                    See All <span className="las la-angle-right"></span>
+                    New Tag <span className="las la-plus"></span>
                   </button>
                 </div>
 
