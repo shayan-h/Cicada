@@ -187,7 +187,7 @@ export default function Dashboard() {
               <div className="card">
                 <div className="card-header">
                   <h3>Your Tags</h3>
-                  <button>
+                  <button id="newProjectButton" onClick={handleNewTagButtonClick}>
                     New Tag <span className="las la-plus"></span>
                   </button>
                 </div>

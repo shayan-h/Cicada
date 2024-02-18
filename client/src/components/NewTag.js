@@ -7,6 +7,7 @@ import axios from 'axios'
 export default function NewTag() {
     const [tagName, setTagName] = useState('')
     const [project, setProject] = useState('')
+    const [severity, setSeverity] = useState('')
     const [tagDescription, setTagDescription] = useState('')
     const [assignedMembers, setAssignedMembers] = useState([''])
 
@@ -14,6 +15,7 @@ export default function NewTag() {
     axios.defaults.withCredentials = true
 
     const [projects, setProjData] = useState([])
+    const [projectMembers, setProjectMembers] = useState([])
 
     const addAssignedMember = () => {
         setAssignedMembers([...assignedMembers, ''])
@@ -56,7 +58,68 @@ export default function NewTag() {
 
     return (
         <body>
+            <div className="create-project-container">
+            <div className="form-box">
+                <h1>Create a New Tag</h1>
+                <form id="newProjectForm" onSubmit={handleSubmitForm}>
+                <label htmlFor="projectName">Tag Name*</label>
+                <input
+                    type="text"
+                    id="projectName"
+                    name="projectName"
+                    required
+                    value={tagName}
+                    onChange={(e) => setTagName(e.target.value)}
+                />
 
+                <label htmlFor='projectSelect'>Project*</label>
+                <select id="projectSelect" value={project} onChange={e => setProject(e.target.value)}>
+                    <option value="">Select project</option>
+                    {projects.map(proj => (
+                        <option key={proj.id} value={proj.projName}>{proj.projName}</option>
+                    ))}
+                </select>
+
+                <label htmlFor='sevSelect'>Tag Severity*</label>
+                <select id="sevSelect" value={severity} onChange={e => setSeverity(e.target.value)}>
+                    <option value="">Select severity</option>
+                    <option key={1} value={"Impaired Functionality"}>Impaired Functionality</option>
+                    <option key={2} value={"Non-critical"}>Non-critical</option>
+                    <option key={3} value={"Minor"}>Minor</option>
+                    <option key={4} value={"Catastrophic"}>Catastrophic</option>
+                </select>
+
+                <label htmlFor="projectDescription">Tag Description*</label>
+                <textarea
+                    id="projectDescription"
+                    name="projectDescription"
+                    required
+                    value={tagDescription}
+                    onChange={(e) => setTagDescription(e.target.value)}
+                ></textarea>
+
+                <label htmlFor="teamMembers">Assigned Members</label>
+                <div id="teamMembersContainer">
+                    {assignedMembers.map((value, index) => (
+                    <input
+                        key={index}
+                        type="text"
+                        name={`assignedMembers[${index}]`}
+                        placeholder="Email"
+                        value={value}
+                        onChange={(e) => handleAssignedMemberChange(index, e.target.value)}
+                    />
+                    ))}
+                </div>
+                <button type="button" onClick={addAssignedMember}>
+                    Add Assigned Member
+                </button>
+
+                <button type="submit">Create Tag</button>
+                <button onClick={() => navigate('/dashboard')}>Close <span className="las la-times"></span></button>
+                </form>
+            </div>
+            </div>
         </body>
     )
 }
