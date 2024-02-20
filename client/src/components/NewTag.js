@@ -17,10 +17,6 @@ export default function NewTag() {
     const [projects, setProjData] = useState([])
     const [projectMembers, setProjectMembers] = useState([])
 
-    const addAssignedMember = () => {
-        setAssignedMembers([...assignedMembers, ''])
-    }
-
     const handleAssignedMemberChange = (e) => {
         const selectedMembers = Array.from(e.target.selectedOptions, (option) => option.value)
         setAssignedMembers(selectedMembers)
@@ -47,6 +43,7 @@ export default function NewTag() {
             try {
                 const response = await axios.get("http://localhost:3002/newTag/getTeam", {project})
                 if (response.data.authenticated) {
+                    console.log("Project members set")
                     setProjectMembers(response.data.team)
                 } else {
                     navigate('/')
