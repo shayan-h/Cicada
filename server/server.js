@@ -10,6 +10,7 @@ import registerRouter from './routes/register.js'
 import loginRouter from './routes/login.js'
 import dashboardRouter from './routes/dashboard.js'
 import newProjectRouter from './routes/newProject.js'
+import newTagRouter from './routes/newTag.js'
 
 // Creating an Express application
 const app = express()
@@ -45,6 +46,7 @@ app.use('/register', registerRouter)
 app.use('/login', loginRouter)
 app.use('/dashboard', dashboardRouter)
 app.use('/newProject', newProjectRouter)
+app.use('/newTag', newTagRouter)
 
 // Starting the server on port 3002
 app.listen(3002, () => {

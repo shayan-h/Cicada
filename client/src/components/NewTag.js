@@ -21,10 +21,9 @@ export default function NewTag() {
         setAssignedMembers([...assignedMembers, ''])
     }
 
-    const handleAssignedMemberChange = (index, value) => {
-        const updatedAssignedMembers = [...assignedMembers]
-        updatedAssignedMembers[index] = value
-        setAssignedMembers(updatedAssignedMembers)
+    const handleAssignedMemberChange = (e) => {
+        const selectedMembers = Array.from(e.target.selectedOptions, (option) => option.value)
+        setAssignedMembers(selectedMembers)
     }
 
     useEffect(() => {
@@ -38,6 +37,22 @@ export default function NewTag() {
                 }
             } catch (error) {
                 console.log("Error during dashboard fetch", error)
+            }
+        }
+        fetchData()
+    }, [])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get("http://localhost:3002/newTag/getTeam", {project})
+                if (response.data.authenticated) {
+                    setProjectMembers(response.data.team)
+                } else {
+                    navigate('/')
+                }
+            } catch (error) {
+                console.log("Error during team fetch", error)
             }
         }
         fetchData()
@@ -76,7 +91,7 @@ export default function NewTag() {
                 <select id="projectSelect" value={project} onChange={e => setProject(e.target.value)}>
                     <option value="">Select project</option>
                     {projects.map(proj => (
-                        <option key={proj.id} value={proj.projName}>{proj.projName}</option>
+                        <option key={proj.id} value={proj.id}>{proj.projName}</option>
                     ))}
                 </select>
 
@@ -99,21 +114,19 @@ export default function NewTag() {
                 ></textarea>
 
                 <label htmlFor="teamMembers">Assigned Members</label>
-                <div id="teamMembersContainer">
-                    {assignedMembers.map((value, index) => (
-                    <input
-                        key={index}
-                        type="text"
-                        name={`assignedMembers[${index}]`}
-                        placeholder="Email"
-                        value={value}
-                        onChange={(e) => handleAssignedMemberChange(index, e.target.value)}
-                    />
-                    ))}
+                <select id='teamSelect' multiple onChange={handleAssignedMemberChange} value={assignedMembers}>
+                    {projectMembers.map((member, index) => {
+                        <option key={index} value={member}>{member}</option>
+                    })}
+                </select>
+                <div>
+                    <h3>Selected Members:</h3>
+                    <ul>
+                        {assignedMembers.map((member, index) => (
+                            <li key={index}>{member}</li>
+                        ))}
+                    </ul>
                 </div>
-                <button type="button" onClick={addAssignedMember}>
-                    Add Assigned Member
-                </button>
 
                 <button type="submit">Create Tag</button>
                 <button onClick={() => navigate('/dashboard')}>Close <span className="las la-times"></span></button>
