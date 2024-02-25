@@ -54,7 +54,6 @@ export default function NewTag() {
                 navigate('/');
             }
         } catch (error) {
-            navigate('/dashboard')
             console.log("Error during team fetch", error)
         }
     }
