@@ -6,7 +6,9 @@ import axios from 'axios'
 
 export default function NewTag() {
     const [tagName, setTagName] = useState('')
+    // Project id to send to db and to use in 2nd useffect
     const [project, setProject] = useState('')
+    const [tagType, setTagType] = useState('')
     const [severity, setSeverity] = useState('')
     const [tagDescription, setTagDescription] = useState('')
     const [assignedMembers, setAssignedMembers] = useState([''])
@@ -14,7 +16,10 @@ export default function NewTag() {
     const navigate = useNavigate();
     axios.defaults.withCredentials = true
 
+    // List of projects displayed on form
     const [projects, setProjData] = useState([])
+
+    // List of emails of team members to display on form
     const [projectMembers, setProjectMembers] = useState([])
 
     const handleAssignedMemberChange = (e) => {
@@ -27,6 +32,7 @@ export default function NewTag() {
             try {
                 const response = await axios.get("http://localhost:3002/dashboard")
                 if (response.data.authenticated) {
+                    console.log("Inside useeffect")
                     setProjData(response.data.projects)
                 } else {
                     navigate('/')
@@ -38,28 +44,31 @@ export default function NewTag() {
         fetchData()
     }, [])
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get("http://localhost:3002/newTag/getTeam", {project})
-                if (response.data.authenticated) {
-                    console.log("Project members set")
-                    setProjectMembers(response.data.team)
-                } else {
-                    navigate('/')
-                }
-            } catch (error) {
-                console.log("Error during team fetch", error)
+    const fetchProjectMembers = async (projectId) => {
+        try {
+            const response = await axios.get("http://localhost:3002/newTag/getTeam", { params: { project: projectId } })
+            if (response.data.authenticated) {
+                
+                setProjectMembers(response.data.team)
+            } else {
+                navigate('/');
             }
+        } catch (error) {
+            navigate('/dashboard')
+            console.log("Error during team fetch", error)
         }
-        fetchData()
-    }, [])
+    }
+
+    const handleProjectSelect = (projectId) => {
+        setProject(projectId)
+        fetchProjectMembers(projectId)
+    }
 
     const handleSubmitForm = async (event) => {
         event.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:3002/newTag', { tagName, tagDescription, assignedMembers })
+            const response = await axios.post('http://localhost:3002/newTag', { tagName, project, tagType, severity, tagDescription, assignedMembers })
             if (response.data.authenticated && response.data.validation) {
                 navigate('/dashboard')
             }
@@ -85,11 +94,18 @@ export default function NewTag() {
                 />
 
                 <label htmlFor='projectSelect'>Project*</label>
-                <select id="projectSelect" value={project} onChange={e => setProject(e.target.value)}>
+                <select id="projectSelect" value={project} onChange={e => handleProjectSelect(e.target.value)}>
                     <option value="">Select project</option>
                     {projects.map(proj => (
                         <option key={proj.id} value={proj.id}>{proj.projName}</option>
                     ))}
+                </select>
+
+                <label htmlFor='typeSelect'>Tag Type*</label>
+                <select id="typeSelect" value={tagType} onChange={e => setTagType(e.target.value)}>
+                    <option value="">Select tag type</option>
+                    <option key={1} value={"Task"}>Task</option>
+                    <option key={2} value={"Bug"}>Bug</option>
                 </select>
 
                 <label htmlFor='sevSelect'>Tag Severity*</label>
@@ -112,9 +128,9 @@ export default function NewTag() {
 
                 <label htmlFor="teamMembers">Assigned Members</label>
                 <select id='teamSelect' multiple onChange={handleAssignedMemberChange} value={assignedMembers}>
-                    {projectMembers.map((member, index) => {
+                    {projectMembers.map((member, index) => (
                         <option key={index} value={member}>{member}</option>
-                    })}
+                    ))}
                 </select>
                 <div>
                     <h3>Selected Members:</h3>

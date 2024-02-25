@@ -28,8 +28,13 @@ const isAuthenticated = (req, res, next) => {
     }
 }
 
+router.post('/', isAuthenticated, (req, res) => {
+    
+})
+
 router.get('/getTeam', isAuthenticated, (req, res) => {
-    const projectId = req.body.project
+    const projectId = req.query.project
+    console.log(projectId)
     const query = "SELECT team_members FROM projects WHERE id = ?"
     connection.query(query, [projectId], async (err, rows) => {
         if (err) {
@@ -43,9 +48,8 @@ router.get('/getTeam', isAuthenticated, (req, res) => {
     
         const team_members_json = rows[0].team_members;
         try {
-            const team_members = JSON.parse(team_members_json);
-            const emails = Object.values(team_members);
-    
+            const emails = Object.values(team_members_json);
+            console.log("get team success!")
             return res.json({authenticated: true, team: emails});
         } catch (parseError) {
             console.log("Error parsing team members JSON:", parseError);
