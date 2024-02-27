@@ -37,7 +37,6 @@ router.post('/', isAuthenticated, (req, res) => {
     if (typeof teamMembers === 'string') {
         teamMembers = JSON.parse(teamMembers)
     }
-    console.log(teamMembers)
 
     teamMembers = teamMembers.filter((member) => member.trim() !== '')
 
@@ -60,9 +59,10 @@ router.post('/', isAuthenticated, (req, res) => {
                 return
             }
             console.log('Project created successfully')
-        })
+        }
+    )
 
-    // Get project ID of the project that was just added so that it can be added to the user's projects column
+    // Get project ID of the project that was just added so that it can be added to the user's projects column (Duplicate project name bug!)
     const query2 = "SELECT id FROM projects WHERE project_name = ?"
     let project_id
     connection.query(query2, [projectName],

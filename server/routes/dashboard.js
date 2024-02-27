@@ -28,7 +28,7 @@ const isAuthenticated = (req, res, next) => {
 }
 
 router.get('/', isAuthenticated, (req, res) => {
-    const query = "SELECT first_name, projects FROM users WHERE id = ?"
+    const query = "SELECT id, first_name, projects FROM users WHERE id = ?"
     connection.query(query, [req.id], async (err, rows) => {
         if (err) {
             console.log("Error in dashboard: mysql")
@@ -47,7 +47,7 @@ router.get('/', isAuthenticated, (req, res) => {
                 status: projectDetails.stat
             })
         }
-        return res.json({authenticated: true, name: user.first_name, projects: projectsArray})
+        return res.json({authenticated: true, userID: user.id, name: user.first_name, projects: projectsArray})
     })
 })
 
