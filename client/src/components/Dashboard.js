@@ -11,6 +11,7 @@ export default function Dashboard() {
   // The following line of code can be changed set to different types of data from the server
   const [name, setData] = useState('')
   const [projects, setProjData] = useState([])
+  const [tags, setTagData] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +20,7 @@ export default function Dashboard() {
         if (response.data.authenticated) {
           setData(response.data.name)
           setProjData(response.data.projects)
+          setTagData(response.data.tags)
         } else {
           navigate('/')
         }
@@ -154,7 +156,6 @@ export default function Dashboard() {
                   <button id="newProjectButton" onClick={handleNewProjectButtonClick}>
                     New Project <span className="las la-plus"></span>
                   </button>
-                  {/* Your script for newProjectButton click event here */}
                 </div>
 
                 <div className="card-body">
@@ -193,7 +194,27 @@ export default function Dashboard() {
                 </div>
 
                 <div className="card-body">
-                  {/* Your tag components here */}
+                  <div className="table-responsive">
+                      <table width="100%">
+                        <thead>
+                          <tr>
+                            <td>Tag name</td>
+                            <td>Type</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tags.map(tag => (
+                            <tr key={tag.id}>
+                              <td>{tag.tagName}</td>
+                              <td>
+                                <span className={`status ${tag.tagStatus === 'Task' ? 'green' : 'red'}`}></span>
+                                {tag.tagStatus}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                  </div>
                 </div>
               </div>
             </div>

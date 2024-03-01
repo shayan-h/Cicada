@@ -16,6 +16,15 @@
     text-align: center;
     color: #fff; /* Set text color to white */
   }
+
+  .create-project-container h4 {
+    color: #fff;
+  }
+
+  .create-project-container li {
+    text-align: center;
+    color: #fff;
+  }
   
   .create-project-container form {
     display: flex;
@@ -56,4 +65,5 @@
     width: 50%;
     margin: 5px auto;
   }
+
   

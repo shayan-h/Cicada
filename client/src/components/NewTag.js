@@ -11,6 +11,7 @@ export default function NewTag() {
     const [tagType, setTagType] = useState('')
     const [severity, setSeverity] = useState('')
     const [tagDescription, setTagDescription] = useState('')
+    const [userID, setUserID] = useState(0)
     const [assignedMembers, setAssignedMembers] = useState([''])
 
     const navigate = useNavigate();
@@ -21,6 +22,9 @@ export default function NewTag() {
 
     // List of emails of team members to display on form
     const [projectMembers, setProjectMembers] = useState([])
+
+    // List of options for sevSelect
+    const [sevOptions, setSevOptions] = useState([])
 
     const handleAssignedMemberChange = (e) => {
         const selectedMembers = Array.from(e.target.selectedOptions, (option) => option.value)
@@ -34,6 +38,7 @@ export default function NewTag() {
                 if (response.data.authenticated) {
                     console.log("Inside useeffect")
                     setProjData(response.data.projects)
+                    setUserID(response.data.userID)
                 } else {
                     navigate('/')
                 }
@@ -43,6 +48,17 @@ export default function NewTag() {
         }
         fetchData()
     }, [])
+
+    const handleTagTypeChange = (value) => {
+        setTagType(value)
+        if (value === "Task") {
+            setSevOptions(["Low", "Medium", "High"])
+        } else if (value === "Bug") {
+            setSevOptions(["Impaired Functionality", "Non-critical", "Minor", "Catastrophic"])
+        }
+        // Reset severity value when tag type changes
+        setSeverity('')
+    }
 
     const fetchProjectMembers = async (projectId) => {
         try {
@@ -67,7 +83,7 @@ export default function NewTag() {
         event.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:3002/newTag', { tagName, project, tagType, severity, tagDescription, assignedMembers })
+            const response = await axios.post('http://localhost:3002/newTag', { tagName, project, tagType, severity, userID, tagDescription, assignedMembers })
             if (response.data.authenticated && response.data.validation) {
                 navigate('/dashboard')
             }
@@ -101,7 +117,7 @@ export default function NewTag() {
                 </select>
 
                 <label htmlFor='typeSelect'>Tag Type*</label>
-                <select id="typeSelect" value={tagType} onChange={e => setTagType(e.target.value)}>
+                <select id="typeSelect" value={tagType} onChange={e => handleTagTypeChange(e.target.value)}>
                     <option value="">Select tag type</option>
                     <option key={1} value={"Task"}>Task</option>
                     <option key={2} value={"Bug"}>Bug</option>
@@ -110,10 +126,9 @@ export default function NewTag() {
                 <label htmlFor='sevSelect'>Tag Severity*</label>
                 <select id="sevSelect" value={severity} onChange={e => setSeverity(e.target.value)}>
                     <option value="">Select severity</option>
-                    <option key={1} value={"Impaired Functionality"}>Impaired Functionality</option>
-                    <option key={2} value={"Non-critical"}>Non-critical</option>
-                    <option key={3} value={"Minor"}>Minor</option>
-                    <option key={4} value={"Catastrophic"}>Catastrophic</option>
+                    {sevOptions.map((option, index) => (
+                        <option key={index} value={option}>{option}</option>
+                    ))}
                 </select>
 
                 <label htmlFor="projectDescription">Tag Description*</label>
@@ -131,8 +146,8 @@ export default function NewTag() {
                         <option key={index} value={member}>{member}</option>
                     ))}
                 </select>
-                <div>
-                    <h3>Selected Members:</h3>
+                <div id='SelectedMembers'>
+                    <h4>Selected Members:</h4>
                     <ul>
                         {assignedMembers.map((member, index) => (
                             <li key={index}>{member}</li>

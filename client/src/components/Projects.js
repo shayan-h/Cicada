@@ -9,6 +9,7 @@ export default function Projects() {
     axios.defaults.withCredentials = true
     const [name, setData] = useState('')
     const [projects, setProjData] = useState([])
+    const [tags, setTagData] = useState([])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -17,6 +18,7 @@ export default function Projects() {
             if (response.data.authenticated) {
               setData(response.data.name)
               setProjData(response.data.projects)
+              setTagData(response.data.tags)
             } else {
               navigate('/')
             }
@@ -93,13 +95,14 @@ export default function Projects() {
                                 <table width="100%">
                                     <thead>
                                         <tr>
-                                            <td>Tag</td>
+                                            <td>Tag name</td>
+                                            <td>Type</td>
                                             <td>Severity</td>
-                                            <td>Status</td>
+                                            <td>Description</td>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    
+                                        
                                     </tbody>
                                 </table>
                             </div>
