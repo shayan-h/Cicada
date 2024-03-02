@@ -28,7 +28,8 @@ const isAuthenticated = (req, res, next) => {
 }
 
 router.get('/', isAuthenticated, (req, res) => {
-    const query = "SELECT first_name, projects FROM users WHERE id = ?"
+    const projectId = req.query.project
+    const query = "SELECT first_name, projects, tags FROM users WHERE id = ?"
     connection.query(query, [req.id], async (err, rows) => {
         if (err) {
             console.log("Error in dashboard: mysql")
@@ -36,21 +37,38 @@ router.get('/', isAuthenticated, (req, res) => {
         }
         const user = rows[0]
         const userProjects = user.projects 
+        const userTags = user.tags
         const projectsArray = []
         const tagsArray = []
 
-        for (const projectId in userProjects) {
-            const projectDetails = await getProjectDetails(userProjects[projectId])
-            projectsArray.push({
-                id: userProjects[projectId],
-                projName: projectDetails.project_name,
-                teamMembers: projectDetails.teamMembers,
-                status: projectDetails.stat,
-                description: projectDetails.des,
-                updated: projectDetails.updated_at
+        
+        const projectDetails = await getProjectDetails(userProjects[projectId])
+        const projectTags = projectDetails.bugs
+        projectsArray.push({
+            id: userProjects[projectId],
+            projName: projectDetails.project_name,
+            teamMembers: projectDetails.teamMembers,
+            status: projectDetails.stat,
+            description: projectDetails.des,
+            updated: projectDetails.updated_at
+        })
+        for (tagId in projectTags) {
+            const tagDetails = await getTagDetails(userTags[tagId])
+            tagsArray.push({
+                id: userTags[tagId],
+                tagName: tagDetails.tag_title,
+                tagStatus: tagDetails.tag_status,
+                tagDes: tagDetails.tag_des,
+                tagSev: tagDetails.tag_severity
             })
         }
-        return res.json({authenticated: true, name: user.first_name, projects: projectsArray, tags: proj})
+
+        return res.json({
+            authenticated: true, 
+            name: user.first_name, 
+            projects: projectsArray, 
+            tags: tagsArray
+        })
     })
 })
 
@@ -67,3 +85,18 @@ const query = "SELECT project_name, team_members, bugs, stat, des, updated_at FR
         })
     })
 }
+
+function getTagDetails(tagId) {
+    const query = "SELECT tag_title, tag_status, tag_des, tag_severity FROM tags WHERE id = ?";
+    return new Promise((resolve,reject) => {
+      connection.query(query, [tagId], (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results[0]);
+        }
+      })
+    })
+}
+
+export default router

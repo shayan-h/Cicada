@@ -18,7 +18,6 @@ export default function Projects() {
             if (response.data.authenticated) {
               setData(response.data.name)
               setProjData(response.data.projects)
-              setTagData(response.data.tags)
             } else {
               navigate('/')
             }
@@ -28,6 +27,23 @@ export default function Projects() {
         }
         fetchData()
       }, [])
+
+    const fetchProjectTags = async (projectId) => {
+        try {
+            const response = await axios.get("http://localhost:3002/projects", { params: { project: projectId } })
+            if (response.data.authenticated) {
+                setTagData(response.data.tags)
+            } else {
+                navigate('/');
+            }
+        } catch (error) {
+            console.log("Error during team fetch", error)
+        }
+    }
+
+    const handleProjectSelect = (projectId) => {
+        fetchProjectTags(projectId)
+    }
 
     return (
     <body>
@@ -67,6 +83,12 @@ export default function Projects() {
                     </label>
 
                     Project Name
+                    <select id="projectSelect" defaultValue="" onChange={(e) => handleProjectSelect(e.target.value)}>
+                        <option value="" disabled>Select Project</option>
+                        {projects.map(proj => (
+                            <option key={proj.id} value={proj.id}>{proj.projName}</option>
+                        ))}
+                    </select>
                 </h2>
                 <div className="search-wrapper">
                     <span className="las la-search"></span>
