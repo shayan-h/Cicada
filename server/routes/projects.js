@@ -45,7 +45,7 @@ router.get('/', isAuthenticated, (req, res) => {
         projectsArray.push({
             id: userProjects[projectId],
             projName: projectDetails.project_name,
-            teamMembers: projectDetails.teamMembers,
+            teamMembers: projectDetails.teamMembers, 
             status: projectDetails.stat,
             description: projectDetails.des,
             updated: projectDetails.updated_at

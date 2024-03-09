@@ -19,6 +19,9 @@ export default function Projects() {
             if (response.data.authenticated) {
               setData(response.data.name)
               setProjData(response.data.projects)
+              if (response.data.projects.length > 0) {
+                handleProjectSelect(response.data.projects[0].id)
+              }
             } else {
               navigate('/')
             }
@@ -46,6 +49,10 @@ export default function Projects() {
         setProjectIdData(projectId)
         fetchProjectTags(projectId)
     } 
+
+    const handleNewTagButtonClick = () => {
+        navigate('/NewTag')
+    }
 
     return (
     <body>
@@ -86,7 +93,7 @@ export default function Projects() {
 
                     Project Name
                     <select id="projectSelect" value={project} onChange={e => handleProjectSelect(e.target.value)}>
-                        <option value="">Select Project</option>
+                        <option value="" disabled hidden>Select Project</option>
                         {projects.map(proj => (
                             <option key={proj.id} value={proj.id}>{proj.projName}</option>
                         ))}
@@ -111,7 +118,9 @@ export default function Projects() {
                         <div className="card-header">
                             <h3>Tags</h3>
 
-                            <button>New tag <span className="las la-plus"></span></button>
+                            <button id="newProjectButton" onClick={handleNewTagButtonClick}>
+                                New Tag <span className="las la-plus"></span>
+                            </button>
                         </div>
 
                         <div className="card-body">
