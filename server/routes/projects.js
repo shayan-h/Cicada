@@ -36,13 +36,11 @@ router.get('/', isAuthenticated, (req, res) => {
             return ;
         }
         const user = rows[0]
-        const userProjects = user.projects 
-        const userTags = user.tags
+        const userProjects = user.projects
         const projectsArray = []
         const tagsArray = []
-
         
-        const projectDetails = await getProjectDetails(userProjects[projectId])
+        const projectDetails = await getProjectDetails(projectId)
         const projectTags = projectDetails.bugs
         projectsArray.push({
             id: userProjects[projectId],
@@ -52,17 +50,18 @@ router.get('/', isAuthenticated, (req, res) => {
             description: projectDetails.des,
             updated: projectDetails.updated_at
         })
-        for (tagId in projectTags) {
-            const tagDetails = await getTagDetails(userTags[tagId])
+        for (const tagKey in projectTags) {
+            const tagValue = projectTags[tagKey]
+            const tagDetails = await getTagDetails(tagValue)
             tagsArray.push({
-                id: userTags[tagId],
+                id: tagValue,
                 tagName: tagDetails.tag_title,
                 tagStatus: tagDetails.tag_status,
                 tagDes: tagDetails.tag_des,
                 tagSev: tagDetails.tag_severity
             })
         }
-
+        
         return res.json({
             authenticated: true, 
             name: user.first_name, 
@@ -74,7 +73,7 @@ router.get('/', isAuthenticated, (req, res) => {
 
 
 function getProjectDetails(projectId) {
-const query = "SELECT project_name, team_members, bugs, stat, des, updated_at FROM projects WHERE id = ?";
+    const query = "SELECT project_name, team_members, bugs, stat, des, updated_at FROM projects WHERE id = ?";
     return new Promise((resolve,reject) => {
         connection.query(query, [projectId], (err, results) => {
         if (err) {

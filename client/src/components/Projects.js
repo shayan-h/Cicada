@@ -10,6 +10,7 @@ export default function Projects() {
     const [name, setData] = useState('')
     const [projects, setProjData] = useState([])
     const [tags, setTagData] = useState([])
+    const [project, setProjectIdData] = useState('')
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,13 +38,14 @@ export default function Projects() {
                 navigate('/');
             }
         } catch (error) {
-            console.log("Error during team fetch", error)
+            console.log("Error during team fetch", error) 
         }
     }
 
     const handleProjectSelect = (projectId) => {
+        setProjectIdData(projectId)
         fetchProjectTags(projectId)
-    }
+    } 
 
     return (
     <body>
@@ -83,8 +85,8 @@ export default function Projects() {
                     </label>
 
                     Project Name
-                    <select id="projectSelect" defaultValue="" onChange={(e) => handleProjectSelect(e.target.value)}>
-                        <option value="" disabled>Select Project</option>
+                    <select id="projectSelect" value={project} onChange={e => handleProjectSelect(e.target.value)}>
+                        <option value="">Select Project</option>
                         {projects.map(proj => (
                             <option key={proj.id} value={proj.id}>{proj.projName}</option>
                         ))}
@@ -124,7 +126,14 @@ export default function Projects() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        
+                                        {tags.map(tag => (
+                                            <tr key={tag.id}>
+                                                <td>{tag.tagName}</td>
+                                                <td>{tag.tagStatus}</td>
+                                                <td>{tag.tagSev}</td>
+                                                <td>{tag.tagDes}</td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>

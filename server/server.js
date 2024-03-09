@@ -48,7 +48,7 @@ app.use('/login', loginRouter)
 app.use('/dashboard', dashboardRouter)
 app.use('/newProject', newProjectRouter)
 app.use('/newTag', newTagRouter)
-app.use('/projects', newProjectRouter)
+app.use('/projects', projectRouter)
 
 // Starting the server on port 3002
 app.listen(3002, () => {
