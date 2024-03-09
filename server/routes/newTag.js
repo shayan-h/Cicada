@@ -97,6 +97,14 @@ router.post('/', isAuthenticated, (req, res) => {
                             console.log('Tag added to user')
                         })
                 })
+            const updateTagNum = "UPDATE users SET tags_count = tags_count + 1 WHERE id = ?"
+            connection.query(updateTagNum, [userID],
+                (err, results) => {
+                    if (err) {
+                        console.err(err)
+                        return
+                    }
+                })
 
             // Update the assigned member's tag column
             assignedMembers.forEach((assiMemberEmail) => {
@@ -126,6 +134,15 @@ router.post('/', isAuthenticated, (req, res) => {
                                 }
                                 console.log(`Tag added to team member: ${assiMemberEmail}`)
                             })
+                    })
+
+                const updateTagNum2 = "UPDATE users SET tags_count = tags_count + 1 WHERE email = ?"
+                connection.query(updateTagNum2, [assiMemberEmail],
+                    (err, results) => {
+                        if (err) {
+                            console.err(err)
+                            return
+                        }
                     })
             })
 
