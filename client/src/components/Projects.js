@@ -99,10 +99,6 @@ export default function Projects() {
                         ))}
                     </select>
                 </h2>
-                <div className="search-wrapper">
-                    <span className="las la-search"></span>
-                    <input type="search" placeholder="Search projects" />
-                </div>
                 <div className="user-wrapper">
                     <img src={process.env.PUBLIC_URL + '/bug_danger_data_internet_malware_security_virus_icon_127084.ico'} width="40px" height="40px" alt="" />
                     <div>
@@ -131,7 +127,7 @@ export default function Projects() {
                                             <td>Tag name</td>
                                             <td>Type</td>
                                             <td>Severity</td>
-                                            <td>Description</td>
+                                            <td>Assigned to</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -140,7 +136,7 @@ export default function Projects() {
                                                 <td>{tag.tagName}</td>
                                                 <td>{tag.tagStatus}</td>
                                                 <td>{tag.tagSev}</td>
-                                                <td>{tag.tagDes}</td>
+                                                <td>{tag.tagAssi}</td>
                                             </tr>
                                         ))}
                                     </tbody>

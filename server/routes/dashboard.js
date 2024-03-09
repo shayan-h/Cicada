@@ -28,7 +28,7 @@ const isAuthenticated = (req, res, next) => {
 }
 
 router.get('/', isAuthenticated, (req, res) => {
-    const query = "SELECT id, first_name, projects, tags FROM users WHERE id = ?"
+    const query = "SELECT id, first_name, projects, tags, project_count, tags_count FROM users WHERE id = ?"
     connection.query(query, [req.id], async (err, rows) => {
         if (err) {
             console.log("Error in dashboard: mysql")
@@ -37,6 +37,8 @@ router.get('/', isAuthenticated, (req, res) => {
         const user = rows[0]
         const userProjects = user.projects
         const userTags = user.tags
+        const numProj = user.project_count
+        const numTag = user.tags_count
         const projectsArray = []
         const tagsArray = []
 
@@ -65,7 +67,9 @@ router.get('/', isAuthenticated, (req, res) => {
             userID: user.id, 
             name: user.first_name, 
             projects: projectsArray,
-            tags: tagsArray
+            tags: tagsArray,
+            nProj: numProj,
+            nTag: numTag
         })
     })
 })

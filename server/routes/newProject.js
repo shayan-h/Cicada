@@ -99,6 +99,15 @@ router.post('/', isAuthenticated, (req, res) => {
                         })
                 })
 
+            const updateProjNum = "UPDATE users SET project_count = project_count + 1 WHERE id = ?"
+            connection.query(updateProjNum, [req.id],
+                (err, results) => {
+                    if (err) {
+                        console.err(err)
+                        return
+                    }
+                })
+
             // Update the team member's project column
             teamMembers.forEach((teamMemberEmail) => {
                 const updateTeamMemberQuery = "SELECT projects FROM users WHERE email = ?"
@@ -127,6 +136,15 @@ router.post('/', isAuthenticated, (req, res) => {
                                 }
                                 console.log(`Project added to team member: ${teamMemberEmail}`)
                             })
+                    })
+
+                const updateProjNum2 = "UPDATE users SET project_count = project_count + 1 WHERE email = ?"
+                connection.query(updateProjNum2, [teamMemberEmail],
+                    (err, results2) => {
+                        if (err) {
+                            console.err(err)
+                            return
+                        }
                     })
             })
         })

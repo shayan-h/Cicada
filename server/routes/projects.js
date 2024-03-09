@@ -36,20 +36,11 @@ router.get('/', isAuthenticated, (req, res) => {
             return ;
         }
         const user = rows[0]
-        const userProjects = user.projects
-        const projectsArray = []
         const tagsArray = []
         
         const projectDetails = await getProjectDetails(projectId)
         const projectTags = projectDetails.bugs
-        projectsArray.push({
-            id: userProjects[projectId],
-            projName: projectDetails.project_name,
-            teamMembers: projectDetails.teamMembers, 
-            status: projectDetails.stat,
-            description: projectDetails.des,
-            updated: projectDetails.updated_at
-        })
+        
         for (const tagKey in projectTags) {
             const tagValue = projectTags[tagKey]
             const tagDetails = await getTagDetails(tagValue)
@@ -57,15 +48,14 @@ router.get('/', isAuthenticated, (req, res) => {
                 id: tagValue,
                 tagName: tagDetails.tag_title,
                 tagStatus: tagDetails.tag_status,
-                tagDes: tagDetails.tag_des,
+                tagAssi: tagDetails.assigned_members,
                 tagSev: tagDetails.tag_severity
             })
         }
         
         return res.json({
             authenticated: true, 
-            name: user.first_name, 
-            projects: projectsArray, 
+            name: user.first_name,
             tags: tagsArray
         })
     })
@@ -86,7 +76,7 @@ function getProjectDetails(projectId) {
 }
 
 function getTagDetails(tagId) {
-    const query = "SELECT tag_title, tag_status, tag_des, tag_severity FROM tags WHERE id = ?";
+    const query = "SELECT tag_title, assigned_members, tag_status, tag_des, tag_severity FROM tags WHERE id = ?";
     return new Promise((resolve,reject) => {
       connection.query(query, [tagId], (err, results) => {
         if (err) {

@@ -12,6 +12,8 @@ export default function Dashboard() {
   const [name, setData] = useState('')
   const [projects, setProjData] = useState([])
   const [tags, setTagData] = useState([])
+  const [nProj, setNProj] = useState(0)
+  const [nTag, setNTag] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,6 +23,8 @@ export default function Dashboard() {
           setData(response.data.name)
           setProjData(response.data.projects)
           setTagData(response.data.tags)
+          setNProj(response.data.nProj)
+          setNTag(response.data.nTag)
         } else {
           navigate('/')
         }
@@ -113,7 +117,7 @@ export default function Dashboard() {
           <div className="cards">
           <div class="card-single">
                     <div>
-                        <h1>612</h1>
+                        <h1>{nProj}</h1>
                         <span>Projects</span>
                     </div>
                     <div>
@@ -122,7 +126,7 @@ export default function Dashboard() {
                 </div>
                 <div class="card-single">
                     <div>
-                        <h1>612</h1>
+                        <h1>{nTag}</h1>
                         <span>Tags</span>
                     </div>
                     <div>
@@ -131,7 +135,7 @@ export default function Dashboard() {
                 </div>
                 <div class="card-single">
                     <div>
-                        <h1>612</h1>
+                        <h1>-</h1>
                         <span>Team</span>
                     </div>
                     <div>
@@ -140,7 +144,7 @@ export default function Dashboard() {
                 </div>
                 <div class="card-single">
                     <div>
-                        <h1>612</h1>
+                        <h1>-</h1>
                         <span>Cicada.AI</span>
                     </div>
                     <div>
