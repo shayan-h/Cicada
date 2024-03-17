@@ -45,6 +45,17 @@ router.post('/', isAuthenticated, (req, res) => {
         teamMembersJson[`Mem${index + 1}`] = member
     })
 
+    // Add current user's email to teamMembersJson
+    const queryEmail = "SELECT email FROM users WHERE id = ?"
+    connection.query(queryEmail, [req.id],
+        (err, results) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+            const currentUserEmail = results[0].email
+            teamMembersJson[`Mem${teamMembers.length + 1}`] = currentUserEmail
+    
     const teamMembersJsonToString = JSON.stringify(teamMembersJson) 
     const statusString = "In Progress"
 
@@ -149,6 +160,7 @@ router.post('/', isAuthenticated, (req, res) => {
             })
         })
         return res.json({validation: true, authenticated: true})
+    })
 })
 
 export default router
