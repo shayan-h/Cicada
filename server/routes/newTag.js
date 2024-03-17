@@ -135,15 +135,25 @@ router.post('/', isAuthenticated, (req, res) => {
                                 console.log(`Tag added to team member: ${assiMemberEmail}`)
                             })
                     })
-
-                const updateTagNum2 = "UPDATE users SET tags_count = tags_count + 1 WHERE email = ?"
-                connection.query(updateTagNum2, [assiMemberEmail],
-                    (err, results) => {
-                        if (err) {
-                            console.err(err)
-                            return
-                        }
-                    })
+                
+                const query5 = "SELECT email FROM users WHERE id = ?"
+                connection.query(query5, [userID], (err, results) => {
+                    if (err) {
+                        console.error(err)
+                        return
+                    }
+                    const userEmail = results[0].email
+                    if (assiMemberEmail !== userEmail) {
+                        const updateTagNum2 = "UPDATE users SET tags_count = tags_count + 1 WHERE email = ?"
+                        connection.query(updateTagNum2, [assiMemberEmail],
+                            (err, results) => {
+                                if (err) {
+                                    console.err(err)
+                                    return
+                                }
+                        })
+                    }
+                })
             })
 
             // Update the bugs column in this projects row with new tag
