@@ -163,4 +163,104 @@ router.post('/', isAuthenticated, (req, res) => {
     })
 })
 
+router.post('/delete', isAuthenticated, (req, res) => {
+    const projectId = req.body.project
+
+    // Get the team members of the project
+    const query = "SELECT team_members FROM projects WHERE id = ?"
+    connection.query(query, [projectId],
+        (err, results) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+            const teamMembersJson = results[0].team_members // ? JSON.parse(results[0].team_members) : {}
+            const teamMembers = Object.values(teamMembersJson)
+
+            // Create a hashset of tag ids to delete from the tags table using projectId
+            const query2 = "SELECT bugs FROM projects WHERE id = ?"
+            connection.query(query2, [projectId],
+                (err, results) => {
+                    if (err) {
+                        console.error(err)
+                        return
+                    }
+                    const tagsJson = results[0].bugs ? JSON.parse(results[0].bugs) : {}
+                    const tagIds = Object.values(tagsJson)
+                    let tagIdsSet = new Set(tagIds)
+
+                    // Delete tags from the tags table
+                    tagIds.forEach((tagId) => {
+                        const deleteTagQuery = "DELETE FROM tags WHERE id = ?"
+                        connection.query(deleteTagQuery, [tagId],
+                            (err, results) => {
+                                if (err) {
+                                    console.error(err)
+                                    return
+                                }
+                                console.log('Tag deleted successfully')
+                            })
+                    })
+                })
+
+            // Remove the project from the user's projects column
+            teamMembers.forEach((teamMemberEmail) => {
+                const updateTeamMemberQuery = "SELECT projects FROM users WHERE email = ?"
+                connection.query(updateTeamMemberQuery, [teamMemberEmail],
+                    (err, updateTeamMemberRes) => {
+                        if (err) {
+                            console.log(err)
+                            return
+                        }
+                        if (!updateTeamMemberRes || updateTeamMemberRes.length === 0) {
+                            console.log("User DNE")
+                            return 
+                        }
+                        let teamMemberProjectsJson = updateTeamMemberRes[0].projects ? updateTeamMemberRes[0].projects : {}
+                        // Loop through teamMemberProjectsJson to find the project to delete
+                        for (const key in teamMemberProjectsJson) {
+                            if (teamMemberProjectsJson[key] === projectId) {
+                                delete teamMemberProjectsJson[key]
+                                break
+                            }
+                        }
+                        console.log("Deleted json: " + JSON.stringify(teamMemberProjectsJson))
+
+                        // Update the team member's projects column
+                        const updateTeamMemberProjectsQuery = "UPDATE users SET projects = ? WHERE email = ?"
+                        connection.query(updateTeamMemberProjectsQuery, [JSON.stringify(teamMemberProjectsJson), teamMemberEmail],
+                            (err, updateTeamMemberResults) => {
+                                if (err) {
+                                    console.error(err)
+                                    return
+                                }
+                                console.log(`Project removed from team member: ${teamMemberEmail}`)
+                            })
+                    })
+
+                /*const updateProjNum2 = "UPDATE users SET project_count = project_count - 1 WHERE email = ?"
+                connection.query(updateProjNum2, [teamMemberEmail],
+                    (err, results2) => {
+                        if (err) {
+                            console.err(err)
+                            return
+                        }
+                    })*/
+            })
+        })
+
+    // Remove the project from the projects table
+    const deleteQuery = "DELETE FROM projects WHERE id = ?"
+    connection.query(deleteQuery, [projectId],
+        (err, results) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+            console.log('Project deleted successfully')
+        })
+
+    return res.json({validation: true, authenticated: true})
+})
+
 export default router

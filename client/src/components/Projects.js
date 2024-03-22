@@ -54,6 +54,22 @@ export default function Projects() {
         navigate('/NewTag')
     }
 
+    const deleteProject = async () => {
+        try {
+            const response = await axios.post("http://localhost:3002/newProject/delete", { project: project })
+            if (response.data.authenticated) {
+                setProjData(projects.filter(proj => proj.id !== project))
+                if (projects.length > 0) {
+                    handleProjectSelect(projects[0].id)
+                }
+            } else {
+                navigate('/')
+            }
+        } catch (error) {
+            navigate('/dashboard')
+        }
+    }
+
     return (
     <body>
         <input type="checkbox" id="nav-toggle" />
@@ -98,6 +114,7 @@ export default function Projects() {
                             <option key={proj.id} value={proj.id}>{proj.projName}</option>
                         ))}
                     </select>
+                    <button onClick={deleteProject}>Delete Project</button>
                 </h2>
                 <div className="user-wrapper">
                     <img src={process.env.PUBLIC_URL + '/bug_danger_data_internet_malware_security_virus_icon_127084.ico'} width="40px" height="40px" alt="" />
