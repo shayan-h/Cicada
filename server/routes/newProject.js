@@ -168,6 +168,7 @@ router.post('/delete', isAuthenticated, (req, res) => {
 
     // Get the team members of the project
     const query = "SELECT team_members FROM projects WHERE id = ?"
+    let teamMembers = []
     connection.query(query, [projectId],
         (err, results) => {
             if (err) {
@@ -175,9 +176,10 @@ router.post('/delete', isAuthenticated, (req, res) => {
                 return
             }
             const teamMembersJson = results[0].team_members ? results[0].team_members : {}
-            const teamMembers = Object.values(teamMembersJson)
+            teamMembers = Object.values(teamMembersJson)
+            console.log("Team members: " + teamMembers)
 
-            // Create a hashset of tag ids to delete from the tags table using projectId
+            // const tagIdsSet = getTagIdSet(projectId)
             const query2 = "SELECT bugs FROM projects WHERE id = ?"
             connection.query(query2, [projectId],
                 (err, results2) => {
@@ -185,128 +187,144 @@ router.post('/delete', isAuthenticated, (req, res) => {
                         console.error(err)
                         return
                     }
-                    console.log("TagsJson: " + results2[0] + "Projectid: " + projectId)
-                    const tagsJson = results[0].bugs ? JSON.parse(results[0].bugs) : {}
+                    const tagsJson = results2[0].bugs ? results2[0].bugs : {}
                     const tagIds = Object.values(tagsJson)
-                    let tagIdsSet = new Set(tagIds)
+                    let tagIdsSet = new Set()
+                    tagIds.forEach((tagId) => {
+                        tagIdsSet.add(tagId)
+                    })
 
                     // Delete tags from the tags table
-                    tagIds.forEach((tagId) => {
+                    tagIds.forEach((tagID) => {
                         const deleteTagQuery = "DELETE FROM tags WHERE id = ?"
-                        connection.query(deleteTagQuery, [tagId],
-                            (err, results3) => {
+                        connection.query(deleteTagQuery, [tagID],
+                            (err, results) => {
                                 if (err) {
                                     console.error(err)
                                     return
                                 }
-                                console.log('Tag deleted successfully')
-                            })
-                    })
-                
-
-            // Remove the project from the user's projects column
-            teamMembers.forEach((teamMemberEmail) => {
-                const updateTeamMemberQuery = "SELECT projects FROM users WHERE email = ?"
-                connection.query(updateTeamMemberQuery, [teamMemberEmail],
-                    (err, updateTeamMemberRes) => {
-                        if (err) {
-                            console.log(err)
-                            return
-                        }
-                        if (!updateTeamMemberRes || updateTeamMemberRes.length === 0) {
-                            console.log("User DNE")
-                            return 
-                        }
-                        let teamMemberProjectsJson = updateTeamMemberRes[0].projects ? updateTeamMemberRes[0].projects : {}
-                        // Loop through teamMemberProjectsJson to find the project to delete
-                        for (const key in teamMemberProjectsJson) {
-                            if (teamMemberProjectsJson[key] === projectId) {
-                                delete teamMemberProjectsJson[key]
-                                break
+                                console.log('Tags deleted successfully')
                             }
-                        }
-                        console.log("Deleted json: " + JSON.stringify(teamMemberProjectsJson))
-
-                        // Update the team member's projects column
-                        const updateTeamMemberProjectsQuery = "UPDATE users SET projects = ? WHERE email = ?"
-                        connection.query(updateTeamMemberProjectsQuery, [JSON.stringify(teamMemberProjectsJson), teamMemberEmail],
-                            (err, updateTeamMemberResults) => {
-                                if (err) {
-                                    console.error(err)
-                                    return
-                                }
-                                console.log(`Project removed from team member: ${teamMemberEmail}`)
-                            })
+                        )
                     })
 
-                // Traverse the user's tags column and delete the tags associated with the ids in the tagIdsSet
-                const updateTeamMemberQuery2 = "SELECT tags FROM users WHERE email = ?"
-                connection.query(updateTeamMemberQuery2, [teamMemberEmail],
-                    (err, updateTeamMemberRes) => {
-                        if (err) {
-                            console.log(err)
-                            return
-                        }
-                        if (!updateTeamMemberRes || updateTeamMemberRes.length === 0) {
-                            console.log("User DNE")
-                            return 
-                        }
-                        let count = 0
-                        let teamMemberTagsJson = updateTeamMemberRes[0].tags ? updateTeamMemberRes[0].tags : {}
-                        for (const key in teamMemberTagsJson) {
-                            if (tagIdsSet.has(teamMemberTagsJson[key])) {
-                                count++
-                                delete teamMemberTagsJson[key]
+                    // Remove the project from the projects table
+                    const deleteQuery = "DELETE FROM projects WHERE id = ?"
+                    connection.query(deleteQuery, [projectId],
+                        (err, resultsNoUse) => {
+                            if (err) {
+                                console.error(err)
+                                return
                             }
+                            console.log('Project deleted successfully')
                         }
+                    )
 
-                        // Update the team member's tags column
-                        const updateTeamMemberTagsQuery = "UPDATE users SET tags = ? WHERE email = ?"
-                        connection.query(updateTeamMemberTagsQuery, [JSON.stringify(teamMemberTagsJson), teamMemberEmail],
-                            (err, updateTeamMemberResults) => {
+                    console.log("TagIdssSet: " + Array.from(tagIdsSet))
+
+                    // Remove the project from the user's projects column
+                    teamMembers.forEach((teamMemberEmail) => {
+                        const updateTeamMemberQuery = "SELECT projects FROM users WHERE email = ?"
+                        connection.query(updateTeamMemberQuery, [teamMemberEmail],
+                            (err, updateTeamMemberRes) => {
                                 if (err) {
-                                    console.error(err)
+                                    console.log(err)
                                     return
                                 }
-                                console.log(`Tags removed from team member: ${teamMemberEmail}`)
-                            })
-                    })
-                
+                                if (!updateTeamMemberRes || updateTeamMemberRes.length === 0) {
+                                    console.log("User DNE")
+                                    return 
+                                }
+                                let teamMemberProjectsJson = updateTeamMemberRes[0].projects ? updateTeamMemberRes[0].projects : {}
+                                // Loop through teamMemberProjectsJson to find the project to delete
+                                for (const key in teamMemberProjectsJson) {
+                                    if (teamMemberProjectsJson[key] === projectId) {
+                                        delete teamMemberProjectsJson[key]
+                                        break
+                                    }
+                                }
 
-                const updateProjNum2 = "UPDATE users SET project_count = project_count - 1 WHERE email = ?"
-                connection.query(updateProjNum2, [teamMemberEmail],
-                    (err, results2) => {
-                        if (err) {
-                            console.err(err)
-                            return
-                        }
-                    })
-                // Update tag_count by subtracting count
-                const updateTagNum = "UPDATE users SET tags_count = tags_count - ? WHERE email = ?"
-                connection.query(updateTagNum, [count, teamMemberEmail],
-                    (err, results) => {
-                        if (err) {
-                            console.err(err)
-                            return
-                        }
-                    })
+                                // Update the team member's projects column
+                                const updateTeamMemberProjectsQuery = "UPDATE users SET projects = ? WHERE email = ?"
+                                connection.query(updateTeamMemberProjectsQuery, [JSON.stringify(teamMemberProjectsJson), teamMemberEmail],
+                                    (err, updateTeamMemberResults) => {
+                                        if (err) {
+                                            console.error(err)
+                                            return
+                                        }
+                                        console.log(`Project removed from team member: ${teamMemberEmail}`)
+                                    }
+                                )
+                            }
+                        )
 
-            })
-        })
-    })
+                        // Traverse the user's tags column and delete the tags associated with the ids in the tagIdsSet
+                        const updateTeamMemberQuery2 = "SELECT tags FROM users WHERE email = ?"
+                        connection.query(updateTeamMemberQuery2, [teamMemberEmail],
+                            (err, updateTeamMemberRes2) => {
+                                if (err) {
+                                    console.log(err)
+                                    return
+                                }
+                                if (!updateTeamMemberRes2 || updateTeamMemberRes2.length === 0) {
+                                    console.log("User DNE")
+                                    return 
+                                }
+                                let count = 0
+                                let teamMemberTagsJson = updateTeamMemberRes2[0].tags ? updateTeamMemberRes2[0].tags : {}
+                                console.log("TagidsSet: " + Array.from(tagIdsSet))
+                                for (const key in teamMemberTagsJson) {
+                                    if (tagIdsSet.has(teamMemberTagsJson[key])) {
+                                        count++
+                                        delete teamMemberTagsJson[key]
+                                    }
+                                }
 
-    // Remove the project from the projects table
-    const deleteQuery = "DELETE FROM projects WHERE id = ?"
-    connection.query(deleteQuery, [projectId],
-        (err, results) => {
-            if (err) {
-                console.error(err)
-                return
-            }
-            console.log('Project deleted successfully')
-        })
+                                // Update the team member's tags column
+                                const updateTeamMemberTagsQuery = "UPDATE users SET tags = ? WHERE email = ?"
+                                connection.query(updateTeamMemberTagsQuery, [JSON.stringify(teamMemberTagsJson), teamMemberEmail],
+                                    (err, updateTeamMemberResults2) => {
+                                        if (err) {
+                                            console.error(err)
+                                            return
+                                        }
+                                        console.log(`Tags removed from team member: ${teamMemberEmail}`)
+                                    }
+                                )
+                                
+                                // Update project_count by subtracting 1
+                                const updateProjNum2 = "UPDATE users SET project_count = project_count - 1 WHERE email = ?"
+                                connection.query(updateProjNum2, [teamMemberEmail],
+                                    (err, results3) => {
+                                        if (err) {
+                                            console.err(err)
+                                            return
+                                        }
+                                    }
+                                )
+
+                                // Update tag_count by subtracting count
+                                const updateTagNum = "UPDATE users SET tags_count = tags_count - ? WHERE email = ?"
+                                connection.query(updateTagNum, [count, teamMemberEmail],
+                                    (err, results4) => {
+                                        if (err) {
+                                            console.err(err)
+                                            return
+                                        }
+                                    }
+                                )
+                            }
+                        )
+                    })
+                }
+            )
+        }
+    )
+
+    
 
     return res.json({validation: true, authenticated: true})
 })
+
 
 export default router
