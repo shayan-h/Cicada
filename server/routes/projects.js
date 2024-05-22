@@ -39,6 +39,14 @@ router.get('/', isAuthenticated, (req, res) => {
         const tagsArray = []
         
         const projectDetails = await getProjectDetails(projectId)
+        // If projectDetails is empty, return everything as usual but with an empty tags array
+        if (!projectDetails) {
+            return res.json({
+                authenticated: true, 
+                name: user.first_name,
+                tags: tagsArray
+            })
+        }
         const projectTags = projectDetails.bugs
         
         for (const tagKey in projectTags) {

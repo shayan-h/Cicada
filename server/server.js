@@ -54,3 +54,5 @@ app.use('/projects', projectRouter)
 app.listen(3002, () => {
     console.log("Server connected on port 3002")
 })
+
+// Code review 5/22/2024 - complete!
