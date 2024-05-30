@@ -69,7 +69,6 @@ router.get('/', isAuthenticated, (req, res) => {
     })
 })
 
-
 function getProjectDetails(projectId) {
     const query = "SELECT project_name, team_members, bugs, stat, des, updated_at FROM projects WHERE id = ?";
     return new Promise((resolve,reject) => {

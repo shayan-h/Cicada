@@ -38,7 +38,8 @@ export default function Projects() {
             if (response.data.authenticated) {
                 setTagData(response.data.tags)
             } else {
-                navigate('/');
+                // If the current project is deleted, reload the page to reset the tags list 
+                window.location.reload()
             }
         } catch (error) {
             console.log("Error during team fetch", error) 
@@ -61,6 +62,8 @@ export default function Projects() {
                 setProjData(projects.filter(proj => proj.id !== project))
                 if (projects.length > 0) {
                     handleProjectSelect(projects[0].id)
+                } else {
+                    navigate('/projects')
                 }
             } else {
                 navigate('/')
